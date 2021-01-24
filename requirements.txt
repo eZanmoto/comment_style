@@ -1,1 +1,2 @@
 pycodestyle==2.6.0
+pyyaml==5.4.1

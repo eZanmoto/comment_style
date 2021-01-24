@@ -18,12 +18,8 @@ check_intg: $(tgt_test_dir)
 check_style:
 	pycodestyle \
 		comment_style.py
-	for pat in '**/*.py' '**/*.sh' '*.Dockerfile' ; do \
-		python3 comment_style.py \
-			"$$pat" \
-			'#' \
-			; \
-	done
+	python3 comment_style.py \
+		"comment_style.yaml"
 
 # We tag `$(tgt_test_dir)` as phony so that the test directory is removed and
 # recreated at the start of every test run.

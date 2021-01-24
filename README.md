@@ -1,5 +1,5 @@
 `comment_style`
-=============
+===============
 
 About
 -----
@@ -10,17 +10,26 @@ formatting.
 Usage
 -----
 
-Run `comment_style.py` with a glob pattern for source files to check, and the
-marker for line comments in the source language:
+Create a sample `comment_style.yaml`:
 
-    $ python3 comment_style.py '**/*.go' '//'
+    # The set of paths to test is built up in a sequence of inclusions and
+    # exclusions.
+    paths:
+    - include: '**/*.go'
+    - exclude: 'target/**'
 
-The above will output any rule violations found in Go source files.
+    comment_markers:
+      line: '//'
+      # This field is optional. Any lines starting with a block comment marker
+      # will be flagged as an error.
+      block: '/*'
 
-An optional marker for block comments can be provided, and the tool will
-highlight any lines where that marker is found as a violation:
+`comment_style.py` can then be run with the given configuration file:
 
-    $ python3 comment_style.py '**/*.go' '//' '/*'
+    $ python3 comment_style.py comment_style.yaml
+
+The above will output any rule violations found in the discovered Go source
+files.
 
 Development
 -----------

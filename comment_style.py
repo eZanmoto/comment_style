@@ -2,39 +2,75 @@
 # Use of this source code is governed by an MIT
 # licence that can be found in the LICENCE file.
 
-# `$0 <glob-pattern> <line-comment-prefix> [multi-line-prefix]` outputs issues
-# found in comment blocks prefixed by `line-comment-prefix`, discovered in
-# files matching `glob-pattern`. Only the first issue encountered in each
-# comment block is output.
-#
-# If `multi-line-prefix` is provided then any lines starting with the given
-# prefix will be flagged as an error.
+# `$0 <config-yaml>` outputs issues found in comment blocks specified in
+# `config-yaml`. Only the first issue encountered in each comment block is
+# output.
 
 import glob
 import sys
+import yaml
 
 
 def main():
-    if len(sys.argv) < 3:
-        msg = "usage: {0} <glob-pattern> <line-comment-prefix>" \
-            + " [block-comment-prefix]".format(sys.argv[0])
-        print(msg)
+    if len(sys.argv) != 2:
+        print("usage: {0} <config-yaml>".format(sys.argv[0]))
         sys.exit(1)
 
-    [glob_pattern, line_comment_prefix] = sys.argv[1:3]
-    block_comment_prefix = None
-    if len(sys.argv) > 3:
-        block_comment_prefix = sys.argv[3]
+    conf_file = sys.argv[1]
+    with open(conf_file) as f:
+        conf = yaml.load(f, Loader=yaml.FullLoader)
+    parsed_conf, err_msg = parse_config(conf)
+    if err_msg is not None:
+        print("couldn't parse '{0}': {1}".format(conf_file, err_msg))
+        sys.exit(1)
 
-    ok = check_files(glob_pattern, line_comment_prefix, block_comment_prefix)
+    paths, line_comment_prefix, block_comment_prefix = parsed_conf
+    ok = check_files(paths, line_comment_prefix, block_comment_prefix)
     if not ok:
         sys.exit(1)
 
 
-def check_files(glob_pattern, line_comment_prefix, block_comment_prefix):
+def parse_config(conf):
+    if conf is None:
+        return (None, "is empty")
+
+    required = ['paths', 'comment_markers']
+    for key in required:
+        if key not in conf:
+            return (None, "doesn't contain '{0}'".format(key))
+
+    paths = set()
+    for i, path in enumerate(conf['paths']):
+        if 'include' in path:
+            if 'exclude' in path:
+                msg = "'paths'[{0}] contains both 'include' and 'exclude'" \
+                    .format(i)
+                return (None, msg)
+            paths.update(set(glob.glob(path['include'], recursive=True)))
+        elif 'exclude' in path:
+            paths.discard(set(glob.glob(path['exclude'], recursive=True)))
+        else:
+            msg = "'paths'[{0}] doesn't contain 'include' or 'exclude'" \
+                .format(i)
+            return (None, msg)
+
+    comment_markers = conf['comment_markers']
+
+    if 'line' not in comment_markers:
+        return (None, "doesn't contain 'comment_markers.line'")
+    line_comment_marker = comment_markers['line']
+
+    block_comment_marker = None
+    if 'block' in comment_markers:
+        block_comment_marker = comment_markers['block']
+
+    parsed_conf = (paths, line_comment_marker, block_comment_marker)
+    return (parsed_conf, None)
+
+
+def check_files(paths, line_comment_prefix, block_comment_prefix):
     errs_found = False
 
-    paths = glob.glob(glob_pattern, recursive=True)
     for path in paths:
         with open(path) as f:
             cur_block = None

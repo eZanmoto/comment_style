@@ -6,19 +6,14 @@
 
 set -o errexit
 
-for conf in tests/*.exp.txt ; do
-    src_lang=$(basename "$conf" | sed 's/\..*//')
-    case "$src_lang" in
-        go)
-            python3 comment_style.py \
-                "tests/test.$src_lang" \
-                '//' \
-                '/*' \
-                > "target/tests/$src_lang.act.txt" \
-                || true
-            ;;
-    esac
+for conf in tests/*.yaml ; do
+    test_name=$(basename "$conf" | sed 's/\..*//')
+    python3 comment_style.py \
+        "tests/$test_name.yaml" \
+        &> "target/tests/$test_name.act.txt" \
+        || true
     diff \
-        "target/tests/$src_lang.act.txt" \
-        "tests/$src_lang.exp.txt"
+        --unified \
+        "tests/$test_name.exp.txt" \
+        "target/tests/$test_name.act.txt"
 done

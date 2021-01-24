@@ -1,0 +1,15 @@
+# Copyright 2021 Sean Kelleher. All rights reserved.
+# Use of this source code is governed by an MIT
+# licence that can be found in the LICENCE file.
+
+# The set of paths to test is built up in a sequence of inclusions and
+# exclusions.
+paths:
+- include: '**/*.go'
+- exclude: 'target/**'
+
+comment_markers:
+  line: '//'
+  # This field is optional. Any lines starting with a block comment marker will
+  # be flagged as an error.
+  block: '/*'

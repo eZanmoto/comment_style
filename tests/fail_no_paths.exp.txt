@@ -1,0 +1,1 @@
+couldn't parse 'tests/fail_no_paths.yaml': doesn't contain 'paths'
