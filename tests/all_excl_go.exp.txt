@@ -1,0 +1,9 @@
+tests/assets/test.py:3: (no_leading_space) Non-empty line comments must start with a space:
+> #This comment should start with a space.
+
+tests/assets/test.py:5: (starts_with_lowercase) Letters at the start of comment sections must be capitalised:
+> # this comment should start with a capital letter.
+
+tests/assets/test.py:7: (no_ending_punctuation) Comment blocks must end with `.`:
+> # This comment should end with a period
+

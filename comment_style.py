@@ -46,9 +46,11 @@ def parse_config(conf):
                 msg = "'paths'[{0}] contains both 'include' and 'exclude'" \
                     .format(i)
                 return (None, msg)
-            paths.update(set(glob.glob(path['include'], recursive=True)))
+            incl = glob.glob(path['include'], recursive=True)
+            paths.update(incl)
         elif 'exclude' in path:
-            paths.discard(set(glob.glob(path['exclude'], recursive=True)))
+            excl = glob.glob(path['exclude'], recursive=True)
+            paths.symmetric_difference_update(excl)
         else:
             msg = "'paths'[{0}] doesn't contain 'include' or 'exclude'" \
                 .format(i)

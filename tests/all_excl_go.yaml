@@ -3,11 +3,7 @@
 # licence that can be found in the LICENCE file.
 
 paths:
-- include: '**/*.py'
-- include: '**/*.sh'
-- include: '**/*.Dockerfile'
-- include: '**/Makefile'
-- exclude: 'tests/assets/*'
-
+- include: 'tests/assets/*'
+- exclude: 'tests/assets/*.go'
 comment_markers:
   line: '#'
