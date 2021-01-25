@@ -8,6 +8,7 @@ set -o errexit
 
 for conf in tests/*.yaml ; do
     test_name=$(basename "$conf" | sed 's/\..*//')
+    echo -n "$test_name..."
     python3 comment_style.py \
         "tests/$test_name.yaml" \
         &> "target/tests/$test_name.act.txt" \
@@ -16,4 +17,5 @@ for conf in tests/*.yaml ; do
         --unified \
         "tests/$test_name.exp.txt" \
         "target/tests/$test_name.act.txt"
+    echo " ok"
 done
