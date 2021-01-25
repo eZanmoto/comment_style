@@ -1,0 +1,62 @@
+tests/assets/test.go:3: (block_comment) Block comment:
+> /* Block comments aren't allowed. */
+
+tests/assets/test.go:5: (no_leading_space) Non-empty line comments must start with a space:
+> //This comment should start with a space.
+
+tests/assets/test.go:7: (starts_with_lowercase) Letters at the start of comment sections must be capitalised:
+> // this comment should start with a capital letter.
+
+tests/assets/test.go:14: (starts_with_lowercase) Letters at the start of comment sections must be capitalised:
+  // Different sections need to start with capital letters.
+  //
+> // this section should start with a capital letter.
+
+tests/assets/test.go:18: (no_ending_punctuation) Comment blocks must end with `.`:
+> // This comment should end with a period
+
+tests/assets/test.go:20: (no_section_ending_punctuation) Sections of comment blocks must end with `.` or `:`:
+> // This comment section should end with a period or colon
+  //
+  // This comment is alright.
+
+tests/assets/test.go:32: (no_ending_punctuation) Comment blocks must end with `.`:
+> // But comment blocks can't end with a colon:
+
+tests/assets/test.go:39: (no_ending_punctuation) Comment blocks must end with `.`:
+  // This comment is alright.
+  //
+> // This comment section should end with a period
+
+tests/assets/test.go:43: (block_starts_empty) Comment blocks can't start with an empty line:
+> //
+  // This comment block starts with a redundant blank line.
+
+tests/assets/test.go:47: (block_ends_empty) Comment blocks can't end with an empty line:
+  // This comment block ends with a redundant blank line.
+> //
+
+tests/assets/test.go:49: (no_leading_space) Non-empty line comments must start with a space:
+> //TODO This should start with a space.
+
+tests/assets/test.go:51: (starts_with_lowercase_after_tag) Letters at the start of tagged comments must be capitalised:
+> // TODO this should start with a capital letter.
+
+tests/assets/test.go:53: (no_leading_space_after_tag) Tagged comments must start with a space:
+> // TODO: This shouldn't have a colon.
+
+tests/assets/test.go:55: (no_leading_space_after_tag) Tagged comments must start with a space:
+> // NOTE: This shouldn't either.
+
+tests/assets/test.go:57: (no_leading_space_after_tag) Tagged comments must start with a space:
+> // FIXME: Nor this.
+
+tests/assets/test.py:3: (no_leading_space) Non-empty line comments must start with a space:
+> #This comment should start with a space.
+
+tests/assets/test.py:5: (starts_with_lowercase) Letters at the start of comment sections must be capitalised:
+> # this comment should start with a capital letter.
+
+tests/assets/test.py:7: (no_ending_punctuation) Comment blocks must end with `.`:
+> # This comment should end with a period
+

@@ -19,13 +19,15 @@ def main():
     conf_file = sys.argv[1]
     with open(conf_file) as f:
         conf = yaml.load(f, Loader=yaml.FullLoader)
-    parsed_conf, err_msg = parse_config(conf)
+
+    rules, err_msg = parse_config(conf)
     if err_msg is not None:
         print("couldn't parse '{0}': {1}".format(conf_file, err_msg))
         sys.exit(1)
 
-    paths, line_comment_prefix, block_comment_prefix = parsed_conf
-    ok = check_files(paths, line_comment_prefix, block_comment_prefix)
+    for rule in rules:
+        paths, line_comment_prefix, block_comment_prefix = rule
+        ok = check_files(paths, line_comment_prefix, block_comment_prefix)
     if not ok:
         sys.exit(1)
 
@@ -34,40 +36,43 @@ def parse_config(conf):
     if conf is None:
         return (None, "is empty")
 
-    required = ['paths', 'comment_markers']
-    for key in required:
-        if key not in conf:
-            return (None, "doesn't contain '{0}'".format(key))
+    rules = []
+    for i, rule in enumerate(conf):
+        required = ['paths', 'comment_markers']
+        for key in required:
+            if key not in rule:
+                return (None, "[{0}] doesn't contain '{1}'".format(i, key))
 
-    paths = set()
-    for i, path in enumerate(conf['paths']):
-        if 'include' in path:
-            if 'exclude' in path:
-                msg = "'paths'[{0}] contains both 'include' and 'exclude'" \
-                    .format(i)
+        paths = set()
+        for j, path in enumerate(rule['paths']):
+            if 'include' in path:
+                if 'exclude' in path:
+                    msg = "[{0}].paths[{1}] contains both 'include' and" \
+                        " 'exclude'".format(i)
+                    return (None, msg)
+                incl = glob.glob(path['include'], recursive=True)
+                paths.update(incl)
+            elif 'exclude' in path:
+                excl = glob.glob(path['exclude'], recursive=True)
+                paths.symmetric_difference_update(excl)
+            else:
+                msg = "[{0}].paths[{1}] doesn't contain 'include' or" \
+                    " 'exclude'".format(i, j)
                 return (None, msg)
-            incl = glob.glob(path['include'], recursive=True)
-            paths.update(incl)
-        elif 'exclude' in path:
-            excl = glob.glob(path['exclude'], recursive=True)
-            paths.symmetric_difference_update(excl)
-        else:
-            msg = "'paths'[{0}] doesn't contain 'include' or 'exclude'" \
-                .format(i)
-            return (None, msg)
 
-    comment_markers = conf['comment_markers']
+        comment_markers = rule['comment_markers']
 
-    if 'line' not in comment_markers:
-        return (None, "doesn't contain 'comment_markers.line'")
-    line_comment_marker = comment_markers['line']
+        if 'line' not in comment_markers:
+            return (None, "doesn't contain 'comment_markers.line'")
+        line_comment_marker = comment_markers['line']
 
-    block_comment_marker = None
-    if 'block' in comment_markers:
-        block_comment_marker = comment_markers['block']
+        block_comment_marker = None
+        if 'block' in comment_markers:
+            block_comment_marker = comment_markers['block']
 
-    parsed_conf = (paths, line_comment_marker, block_comment_marker)
-    return (parsed_conf, None)
+        rules.append((paths, line_comment_marker, block_comment_marker))
+
+    return (rules, None)
 
 
 def check_files(paths, line_comment_prefix, block_comment_prefix):

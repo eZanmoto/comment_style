@@ -2,6 +2,6 @@
 # Use of this source code is governed by an MIT
 # licence that can be found in the LICENCE file.
 
-comment_markers:
-  line: '//'
-  block: '/*'
+- comment_markers:
+    line: '//'
+    block: '/*'

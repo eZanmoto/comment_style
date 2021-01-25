@@ -3,7 +3,12 @@
 # licence that can be found in the LICENCE file.
 
 - paths:
-  - include: 'tests/assets/*'
-  - exclude: 'tests/assets/*.go'
+  - include: 'tests/assets/test.go'
+  comment_markers:
+    line: '//'
+    block: '/*'
+
+- paths:
+  - include: 'tests/assets/test.py'
   comment_markers:
     line: '#'

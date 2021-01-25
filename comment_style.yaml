@@ -2,12 +2,11 @@
 # Use of this source code is governed by an MIT
 # licence that can be found in the LICENCE file.
 
-paths:
-- include: '**/*.py'
-- include: '**/*.sh'
-- include: '**/*.Dockerfile'
-- include: '**/Makefile'
-- exclude: 'tests/assets/*'
-
-comment_markers:
-  line: '#'
+- paths:
+  - include: '**/*.py'
+  - include: '**/*.sh'
+  - include: '**/*.Dockerfile'
+  - include: '**/Makefile'
+  - exclude: 'tests/assets/*'
+  comment_markers:
+    line: '#'

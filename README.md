@@ -12,24 +12,31 @@ Usage
 
 Create a sample `comment_style.yaml`:
 
-    # The set of paths to test is built up in a sequence of inclusions and
-    # exclusions.
-    paths:
-    - include: '**/*.go'
-    - exclude: 'target/**'
+      # The set of paths to test is built up in a sequence of inclusions and
+      # exclusions.
+    - paths:
+      - include: '**/*.go'
+      - exclude: 'target/**'
 
-    comment_markers:
-      line: '//'
-      # This field is optional. Any lines starting with a block comment marker
-      # will be flagged as an error.
-      block: '/*'
+      comment_markers:
+        line: '//'
+        # This field is optional. Any lines starting with a block comment marker
+        # will be flagged as an error.
+        block: '/*'
+
+    - paths:
+      - include: '**/*.py'
+      - exclude: 'target/**'
+      comment_markers:
+        line: '#'
 
 `comment_style.py` can then be run with the given configuration file:
 
     $ python3 comment_style.py comment_style.yaml
 
 The above will output any rule violations found in the discovered Go source
-files.
+files. The configuration file contains a list of rules to enable checking for
+different comment markers with a single configuration file.
 
 Development
 -----------
