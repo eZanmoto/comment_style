@@ -14,6 +14,11 @@
     # will be flagged as an error.
     block: '/*'
 
+  # `comment_checker` will not flag the following violation types.
+  allow:
+  - block_starts_empty
+  - block_ends_empty
+
 - paths:
   - include: '**/*.py'
   - exclude: 'target/**'

@@ -20,14 +20,13 @@ def main():
     with open(conf_file) as f:
         conf = yaml.load(f, Loader=yaml.FullLoader)
 
-    rules, err_msg = parse_config(conf)
+    paths_rules, err_msg = parse_config(conf)
     if err_msg is not None:
         print("couldn't parse '{0}': {1}".format(conf_file, err_msg))
         sys.exit(1)
 
-    for rule in rules:
-        paths, line_comment_prefix, block_comment_prefix = rule
-        ok = check_files(paths, line_comment_prefix, block_comment_prefix)
+    for paths, rule in paths_rules:
+        ok = check_files(paths, rule)
     if not ok:
         sys.exit(1)
 
@@ -36,7 +35,7 @@ def parse_config(conf):
     if conf is None:
         return (None, "is empty")
 
-    rules = []
+    paths_rules = []
     for i, rule in enumerate(conf):
         required = ['paths', 'comment_markers']
         for key in required:
@@ -70,12 +69,31 @@ def parse_config(conf):
         if 'block' in comment_markers:
             block_comment_marker = comment_markers['block']
 
-        rules.append((paths, line_comment_marker, block_comment_marker))
+        allowed_violations = set()
+        if 'allow' in rule:
+            allowed_violations = set(rule['allow'])
+            invalid_err_codes = allowed_violations.difference(ERR_MSGS.keys())
+            if len(invalid_err_codes) != 0:
+                msg = "[{0}] contains invalid error codes: {1}".format(
+                    i,
+                    "'" + "', '".join(invalid_err_codes) + "'",
+                )
+                return (None, msg)
 
-    return (rules, None)
+        paths_rules.append((
+            paths,
+            (
+                line_comment_marker,
+                block_comment_marker,
+                ErrPrinter(allowed_violations),
+            ),
+        ))
+
+    return (paths_rules, None)
 
 
-def check_files(paths, line_comment_prefix, block_comment_prefix):
+def check_files(paths, rule):
+    line_comment_prefix, block_comment_prefix, err_printer = rule
     errs_found = False
 
     for path in paths:
@@ -93,7 +111,7 @@ def check_files(paths, line_comment_prefix, block_comment_prefix):
                 if block_comment_prefix is not None \
                         and line.startswith(block_comment_prefix):
                     err_code = 'block_comment'
-                    print(render_err(path, line_num, err_code, [line], 0))
+                    err_printer.print(path, line_num, err_code, [line], 0)
                     errs_found = True
 
                 if line.startswith(line_comment_prefix):
@@ -104,36 +122,40 @@ def check_files(paths, line_comment_prefix, block_comment_prefix):
                         cur_block[1].append(line)
                         cur_block[2].append(stripped_line)
                 else:
-                    errs_found = \
-                        maybe_check_code_block(path, cur_block) or errs_found
+                    if code_block_has_err(err_printer, path, cur_block):
+                        errs_found = True
                     cur_block = None
 
                 line_num += 1
 
-            errs_found = maybe_check_code_block(path, cur_block) or errs_found
+            if code_block_has_err(err_printer, path, cur_block):
+                errs_found = True
             cur_block = None
 
     return not errs_found
 
 
-def maybe_check_code_block(path, cur_block):
+def code_block_has_err(err_printer, path, cur_block):
     """
         Output an error and return `True` if an error is found in `cur_block`.
     """
-    if cur_block is not None:
-        block_start_line_num, block_lines, stripped_block_lines = cur_block
-        err = check_comment_block(stripped_block_lines)
-        if err is not None:
-            err_line_offset, err_code = err
-            print(render_err(
-                path,
-                block_start_line_num + err_line_offset,
-                err_code,
-                block_lines,
-                err_line_offset,
-            ))
-            return True
-    return False
+    if cur_block is None:
+        return False
+
+    block_start_line_num, block_lines, stripped_block_lines = cur_block
+    err = check_comment_block(stripped_block_lines)
+    if err is None:
+        return False
+
+    err_line_offset, err_code = err
+    err_printer.print(
+        path,
+        block_start_line_num + err_line_offset,
+        err_code,
+        block_lines,
+        err_line_offset,
+    )
+    return True
 
 
 def check_comment_block(lines):
@@ -191,14 +213,26 @@ def try_lstrip(line, prefix):
     return (line, False)
 
 
-def render_err(fpath, err_line_num, err_code, preview_lines, err_line_offset):
-    return '{}:{}: ({}) {}:{}\n'.format(
+class ErrPrinter:
+    def __init__(self, allowed_violations):
+        self._allowed_violations = allowed_violations
+
+    def print(
+        self,
         fpath,
         err_line_num,
         err_code,
-        ERR_MSGS[err_code],
-        render_err_lines(err_line_offset, preview_lines),
-    )
+        preview_lines,
+        err_line_offset,
+    ):
+        if err_code not in self._allowed_violations:
+            print('{}:{}: ({}) {}:{}\n'.format(
+                fpath,
+                err_line_num,
+                err_code,
+                ERR_MSGS[err_code],
+                render_err_lines(err_line_offset, preview_lines),
+            ))
 
 
 ERR_MSGS = {
