@@ -111,7 +111,7 @@ def check_files(paths, rule):
                 if block_comment_prefix is not None \
                         and line.startswith(block_comment_prefix):
                     err_code = 'block_comment'
-                    err_printer.print(path, line_num, err_code, [line], 0)
+                    err_printer.print(path, line_num, err_code, ([line], 0))
                     errs_found = True
 
                 if line.startswith(line_comment_prefix):
@@ -152,8 +152,7 @@ def code_block_has_err(err_printer, path, cur_block):
         path,
         block_start_line_num + err_line_offset,
         err_code,
-        block_lines,
-        err_line_offset,
+        (block_lines, err_line_offset),
     )
     return True
 
@@ -222,16 +221,16 @@ class ErrPrinter:
         fpath,
         err_line_num,
         err_code,
-        preview_lines,
-        err_line_offset,
+        preview,
     ):
         if err_code not in self._allowed_violations:
+            err_lines, err_index = preview
             print('{}:{}: ({}) {}:{}\n'.format(
                 fpath,
                 err_line_num,
                 err_code,
                 ERR_MSGS[err_code],
-                render_err_lines(err_line_offset, preview_lines),
+                render_err_lines(err_index, err_lines),
             ))
 
 
