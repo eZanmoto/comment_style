@@ -10,3 +10,4 @@
   allow:
   - no_leading_space
   - starts_with_lowercase
+  - trailing_comment

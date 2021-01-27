@@ -1,0 +1,39 @@
+tests/assets/trailing.py:2: (trailing_comment) Comments must be on their own line:
+> x # Bad.
+
+tests/assets/trailing.py:3: (trailing_comment) Comments must be on their own line:
+> x = '' # Bad.
+
+tests/assets/trailing.py:5: (trailing_comment) Comments must be on their own line:
+> x = '# Okay.' # Bad.
+
+tests/assets/trailing.py:6: (trailing_comment) Comments must be on their own line:
+> x = "" # Bad.
+
+tests/assets/trailing.py:8: (trailing_comment) Comments must be on their own line:
+> x = "# Okay." # Bad.
+
+tests/assets/trailing.py:9: (trailing_comment) Comments must be on their own line:
+> x = `` # Bad.
+
+tests/assets/trailing.py:11: (trailing_comment) Comments must be on their own line:
+> x = `# Okay.` # Bad.
+
+tests/assets/trailing.py:12: (trailing_comment) Comments must be on their own line:
+> x = '''''' # Bad.
+
+tests/assets/trailing.py:14: (trailing_comment) Comments must be on their own line:
+> x = '''# Okay.''' # Bad.
+
+tests/assets/trailing.py:17: (trailing_comment) Comments must be on their own line:
+> x = #''
+
+tests/assets/trailing.py:18: (trailing_comment) Comments must be on their own line:
+> x =##''
+
+tests/assets/trailing.py:19: (trailing_comment) Comments must be on their own line:
+> x = '' #
+
+tests/assets/trailing.py:20: (trailing_comment) Comments must be on their own line:
+> x = ''#
+

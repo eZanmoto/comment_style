@@ -20,9 +20,14 @@ Create a sample `comment_style.yaml`:
 
       comment_markers:
         line: '//'
-        # This field is optional. Any lines starting with a block comment marker
-        # will be flagged as an error.
+        # The `block` field is optional. Any lines starting with a block comment
+        # marker will be flagged as an error.
         block: '/*'
+
+      allow:
+        # See the "False positives" section for more details on why it may be
+        # necessary to allow `trailing_comment` violations.
+      - trailing_comment
 
     - paths:
       - include: '**/*.py'
@@ -54,6 +59,23 @@ Note that tagged comments are those that start with `TODO`, `NOTE` or `FIXME`.
 * `no_section_ending_punctuation`: Sections of comment blocks must end with `.`
   or `:`.
 * `no_ending_punctuation`: Comment blocks must end with `.`.
+* `trailing_comment`: Comments must be on their own line.
+
+### False positives
+
+The check for the `trailing_comment` attempts to check whether the comment
+marker is within a string to avoid false positives. However, to do this in a
+language-independent way, `comment_style.py` uses a heuristic approach rather
+than a syntactic one. Because of this, and because the heuristic only applies to
+individual lines and not groups of lines, false positives (and false negatives)
+can occur. This is especially so in the case of multi-line strings. Depending on
+the scenario it may be necessary to allow violations of the `trailing_comment`
+rule.
+
+As an example, this project checks for `#` comments in shell scripts (`.sh`
+files). However, `#` can naturally occur in shell scripts in the context of
+`$#`. This gives a false-positive `trailing_comment` violation, so this is
+allowed in the `comment_style.yaml` that this project uses.
 
 Development
 -----------

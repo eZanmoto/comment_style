@@ -7,8 +7,16 @@ tgt_test_dir:=$(tgt_dir)/tests
 
 .PHONY: check
 check: \
+		check_unit \
 		check_intg \
 		check_style
+
+.PHONY: check_unit
+check_unit:
+	python3 \
+		-m doctest \
+		test_comment_style.py
+	python3 test_comment_style.py
 
 .PHONY: check_intg
 check_intg: $(tgt_test_dir)

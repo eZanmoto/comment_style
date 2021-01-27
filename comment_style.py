@@ -93,44 +93,57 @@ def parse_config(conf):
 
 
 def check_files(paths, rule):
-    line_comment_prefix, block_comment_prefix, err_printer = rule
     errs_found = False
-
     for path in paths:
         with open(path) as f:
-            cur_block = None
-            line_num = 1
-            for line in f:
-                if line[-1] == '\n':
-                    line = line[:-1]
+            if not check_file(path, rule, f):
+                errs_found = True
+    return not errs_found
 
-                # We rely on external formatting tools to ensure that leading
-                # whitespace is correct.
-                line = line.lstrip()
 
-                if block_comment_prefix is not None \
-                        and line.startswith(block_comment_prefix):
-                    err_code = 'block_comment'
-                    err_printer.print(path, line_num, err_code, ([line], 0))
-                    errs_found = True
+def check_file(path, rule, f):
+    line_comment_prefix, block_comment_prefix, err_printer = rule
 
-                if line.startswith(line_comment_prefix):
-                    stripped_line = line[len(line_comment_prefix):]
-                    if cur_block is None:
-                        cur_block = (line_num, [line], [stripped_line])
-                    else:
-                        cur_block[1].append(line)
-                        cur_block[2].append(stripped_line)
-                else:
-                    if code_block_has_err(err_printer, path, cur_block):
-                        errs_found = True
-                    cur_block = None
+    errs_found = False
+    cur_block = None
+    line_num = 1
+    for line in f:
+        if line[-1] == '\n':
+            line = line[:-1]
 
-                line_num += 1
+        # We rely on external formatting tools to ensure that leading
+        # whitespace is correct.
+        line = line.lstrip()
 
+        if block_comment_prefix is not None \
+                and line.startswith(block_comment_prefix):
+            err_code = 'block_comment'
+            err_printer.print(path, line_num, err_code, ([line], 0))
+            errs_found = True
+
+        if line.startswith(line_comment_prefix):
+            stripped_line = line[len(line_comment_prefix):]
+            if cur_block is None:
+                cur_block = (line_num, [line], [stripped_line])
+            else:
+                cur_block[1].append(line)
+                cur_block[2].append(stripped_line)
+        else:
             if code_block_has_err(err_printer, path, cur_block):
                 errs_found = True
             cur_block = None
+
+            for index in find_all(line, line_comment_prefix):
+                if not is_likely_in_str(line, index):
+                    err_code = 'trailing_comment'
+                    preview = ([line], 0)
+                    err_printer.print(path, line_num, err_code, preview)
+                    break
+
+        line_num += 1
+
+    if code_block_has_err(err_printer, path, cur_block):
+        errs_found = True
 
     return not errs_found
 
@@ -253,6 +266,8 @@ ERR_MSGS = {
         "Letters at the start of tagged comments must be capitalised",
     'no_ending_punctuation':
         "Comment blocks must end with `.`",
+    'trailing_comment':
+        "Comments must be on their own line",
 }
 
 
@@ -264,6 +279,46 @@ def render_err_lines(err_line_index, lines):
             line.lstrip(),
         )
     return s
+
+
+def find_all(s, substr):
+    """
+        Return a list of indices of non-overlapping occurrences of `substr`
+        within `s`.
+    """
+    indexs = []
+    cur_index = -1
+    while True:
+        cur_index = s.find(substr, cur_index + 1)
+        if cur_index == -1:
+            break
+        indexs.append(cur_index)
+    return indexs
+
+
+def is_likely_in_str(line, index):
+    """
+        Return `True` if the `index` is likely to be within a string, according
+        to the handling of strings in typical programming languages. Index `0`
+        is considered to be within a string.
+    """
+    cur_str_char = None
+    escaped = False
+
+    def in_str():
+        return cur_str_char is not None
+
+    for i, char in enumerate(line[:index]):
+        if char in ['\'', '"', '`']:
+            if in_str():
+                if char == cur_str_char and not escaped:
+                    cur_str_char = None
+            else:
+                cur_str_char = char
+
+        escaped = in_str() and char == '\\' and not escaped
+
+    return in_str()
 
 
 if __name__ == '__main__':

@@ -18,6 +18,7 @@
   allow:
   - block_starts_empty
   - block_ends_empty
+  - trailing_comment
 
 - paths:
   - include: '**/*.py'

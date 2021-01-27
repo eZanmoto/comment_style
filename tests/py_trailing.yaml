@@ -3,7 +3,6 @@
 # licence that can be found in the LICENCE file.
 
 - paths:
-  - include: 'tests/assets/*'
-  - exclude: 'tests/assets/*.go'
+  - include: 'tests/assets/trailing.py'
   comment_markers:
     line: '#'

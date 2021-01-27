@@ -55,3 +55,5 @@
 // NOTE: This shouldn't either.
 
 // FIXME: Nor this.
+
+var x = "" // Trailing comments aren't allowed.

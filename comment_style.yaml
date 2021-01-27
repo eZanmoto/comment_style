@@ -4,9 +4,15 @@
 
 - paths:
   - include: '**/*.py'
-  - include: '**/*.sh'
   - include: '**/*.Dockerfile'
   - include: '**/Makefile'
   - exclude: 'tests/assets/*'
   comment_markers:
     line: '#'
+
+- paths:
+  - include: '**/*.sh'
+  comment_markers:
+    line: '#'
+  allow:
+  - trailing_comment
