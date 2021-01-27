@@ -38,6 +38,23 @@ The above will output any rule violations found in the discovered Go source
 files. The configuration file contains a list of rules to enable checking for
 different comment markers with a single configuration file.
 
+Rules/Codes
+-----------
+
+Note that tagged comments are those that start with `TODO`, `NOTE` or `FIXME`.
+
+* `block_comment`: Block comments aren't allowed.
+* `block_starts_empty`: Comment blocks can't start with an empty line.
+* `block_ends_empty`: Comment blocks can't end with an empty line.
+* `no_leading_space`: Non-empty line comments must start with a space.
+* `no_leading_space_after_tag`: Tagged comments  must start with a space.
+* `starts_with_lowercase`: Letters at the start of comments must be capitalised.
+* `starts_with_lowercase_after_tag`: Letters at the start of tagged comments
+  must be capitalised.
+* `no_section_ending_punctuation`: Sections of comment blocks must end with `.`
+  or `:`.
+* `no_ending_punctuation`: Comment blocks must end with `.`.
+
 Development
 -----------
 
@@ -72,20 +89,3 @@ Docker build environment by running the following:
 
 Note that the environment will need to have the project requirements installed
 as detailed in the previous section.
-
-Rules/Codes
------------
-
-Note that tagged comments are those that start with `TODO`, `NOTE` or `FIXME`.
-
-* `block_comment`: Block comments aren't allowed.
-* `block_starts_empty`: Comment blocks can't start with an empty line.
-* `block_ends_empty`: Comment blocks can't end with an empty line.
-* `no_leading_space`: Non-empty line comments must start with a space.
-* `no_leading_space_after_tag`: Tagged comments  must start with a space.
-* `starts_with_lowercase`: Letters at the start of comments must be capitalised.
-* `starts_with_lowercase_after_tag`: Letters at the start of tagged comments
-  must be capitalised.
-* `no_section_ending_punctuation`: Sections of comment blocks must end with `.`
-  or `:`.
-* `no_ending_punctuation`: Comment blocks must end with `.`.
