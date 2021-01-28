@@ -1,0 +1,15 @@
+# Copyright 2021 Sean Kelleher. All rights reserved.
+# Use of this source code is governed by an MIT
+# licence that can be found in the LICENCE file.
+
+- paths:
+  - include: 'tests/assets/test.go'
+  comment_markers:
+    line: '//'
+    block: '/*'
+
+- paths:
+  - include: 'tests/assets/test.c'
+  comment_markers:
+    line: '//'
+    block: '/*'
