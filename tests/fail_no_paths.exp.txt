@@ -1,1 +1,1 @@
-couldn't parse 'tests/fail_no_paths.yaml': [0] doesn't contain 'paths'
+couldn't parse 'tests/fail_no_paths.yaml': `[0]` doesn't contain 'paths'

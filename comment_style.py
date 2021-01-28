@@ -40,13 +40,13 @@ def parse_config(conf):
         required = ['paths', 'comment_markers']
         for key in required:
             if key not in rule:
-                return (None, "[{0}] doesn't contain '{1}'".format(i, key))
+                return (None, "`[{0}]` doesn't contain '{1}'".format(i, key))
 
         paths = set()
         for j, path in enumerate(rule['paths']):
             if 'include' in path:
                 if 'exclude' in path:
-                    msg = "[{0}].paths[{1}] contains both 'include' and" \
+                    msg = "`[{0}].paths[{1}]` contains both 'include' and" \
                         " 'exclude'".format(i)
                     return (None, msg)
                 incl = glob.glob(path['include'], recursive=True)
@@ -55,12 +55,12 @@ def parse_config(conf):
                 excl = glob.glob(path['exclude'], recursive=True)
                 paths.difference_update(excl)
             else:
-                msg = "[{0}].paths[{1}] doesn't contain 'include' or" \
+                msg = "`[{0}].paths[{1}]` doesn't contain 'include' or" \
                     " 'exclude'".format(i, j)
                 return (None, msg)
 
         if len(paths) == 0:
-            return (None, "[{0}].paths doesn't match any files".format(i))
+            return (None, "`[{0}].paths` doesn't match any files".format(i))
 
         comment_markers = rule['comment_markers']
 
@@ -77,7 +77,7 @@ def parse_config(conf):
             allowed_violations = set(rule['allow'])
             invalid_err_codes = allowed_violations.difference(ERR_MSGS.keys())
             if len(invalid_err_codes) != 0:
-                msg = "[{0}] contains invalid error codes: {1}".format(
+                msg = "`[{0}]` contains invalid error codes: {1}".format(
                     i,
                     "'" + "', '".join(invalid_err_codes) + "'",
                 )
