@@ -2,7 +2,8 @@
 # Use of this source code is governed by an MIT
 # licence that can be found in the LICENCE file.
 
-- paths: []
+- paths:
+  - include: 'tests/assets/test.go'
   comment_markers:
     line: '//'
   allow:

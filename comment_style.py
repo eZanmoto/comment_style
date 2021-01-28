@@ -59,6 +59,9 @@ def parse_config(conf):
                     " 'exclude'".format(i, j)
                 return (None, msg)
 
+        if len(paths) == 0:
+            return (None, "[{0}].paths doesn't match any files".format(i))
+
         comment_markers = rule['comment_markers']
 
         if 'line' not in comment_markers:
