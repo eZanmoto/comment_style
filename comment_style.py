@@ -13,7 +13,7 @@ import yaml
 
 def main():
     if len(sys.argv) != 2:
-        print("usage: {0} <config-yaml>".format(sys.argv[0]))
+        eprint("usage: {0} <config-yaml>".format(sys.argv[0]))
         sys.exit(1)
 
     conf_file = sys.argv[1]
@@ -22,13 +22,17 @@ def main():
 
     paths_rules, err_msg = parse_config(conf)
     if err_msg is not None:
-        print("couldn't parse '{0}': {1}".format(conf_file, err_msg))
+        eprint("couldn't parse '{0}': {1}".format(conf_file, err_msg))
         sys.exit(1)
 
     for paths, rule in paths_rules:
         ok = check_files(paths, rule)
     if not ok:
         sys.exit(1)
+
+
+def eprint(s):
+    print(s, file=sys.stderr)
 
 
 def parse_config(conf):
