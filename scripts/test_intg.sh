@@ -19,9 +19,15 @@ for conf in tests/*.yaml ; do
         continue
     fi
 
+    options=
+    if [ "$cur_test_name" = "verbose" ] ; then
+        options='--verbose'
+    fi
+
     echo -n "$cur_test_name..."
     python3 comment_style.py \
         "tests/$cur_test_name.yaml" \
+        $options \
         &> "target/tests/$cur_test_name.act.txt" \
         || true
     diff \

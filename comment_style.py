@@ -2,9 +2,9 @@
 # Use of this source code is governed by an MIT
 # licence that can be found in the LICENCE file.
 
-# `$0 <config-yaml>` outputs issues found in comment blocks specified in
-# `config-yaml`. Only the first issue encountered in each comment block is
-# output.
+# `$0 <config-yaml> [--verbose]` outputs issues found in comment blocks
+# specified in `config-yaml`. Only the first issue encountered in each comment
+# block is output.
 
 import glob
 import sys
@@ -12,27 +12,33 @@ import yaml
 
 
 def main():
-    if len(sys.argv) != 2:
-        eprint("usage: {0} <config-yaml>".format(sys.argv[0]))
-        sys.exit(1)
+    if len(sys.argv) > 3:
+        fatal("usage: {0} <config-yaml> [--verbose]".format(sys.argv[0]))
 
     conf_file = sys.argv[1]
+    verbose = False
+    if len(sys.argv) > 2:
+        if sys.argv[2] not in ['-v', '--verbose']:
+            fatal("usage: {0} <config-yaml> [--verbose]".format(sys.argv[0]))
+        verbose = True
+
     with open(conf_file) as f:
         conf = yaml.load(f, Loader=yaml.FullLoader)
 
     paths_rules, err_msg = parse_config(conf)
     if err_msg is not None:
-        eprint("couldn't parse '{0}': {1}".format(conf_file, err_msg))
-        sys.exit(1)
+        fatal("couldn't parse '{0}': {1}".format(conf_file, err_msg))
 
+    path_logger = PathLogger(verbose)
     for paths, rule in paths_rules:
-        ok = check_files(paths, rule)
+        ok = check_files(path_logger, paths, rule)
     if not ok:
         sys.exit(1)
 
 
-def eprint(s):
+def fatal(s):
     print(s, file=sys.stderr)
+    sys.exit(1)
 
 
 def parse_config(conf):
@@ -99,9 +105,10 @@ def parse_config(conf):
     return (paths_rules, None)
 
 
-def check_files(paths, rule):
+def check_files(path_logger, paths, rule):
     errs_found = False
     for path in paths:
+        path_logger.log(path)
         with open(path) as f:
             if not check_file(path, rule, f):
                 errs_found = True
@@ -326,6 +333,15 @@ def is_likely_in_str(line, index):
         escaped = in_str() and char == '\\' and not escaped
 
     return in_str()
+
+
+class PathLogger:
+    def __init__(self, enabled):
+        self._enabled = enabled
+
+    def log(self, path):
+        if self._enabled:
+            print("Checking '{}'...".format(path))
 
 
 if __name__ == '__main__':
