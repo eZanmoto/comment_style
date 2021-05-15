@@ -12,7 +12,7 @@ import yaml
 
 
 def main():
-    if len(sys.argv) > 3:
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
         fatal("usage: {0} <config-yaml> [--verbose]".format(sys.argv[0]))
 
     conf_file = sys.argv[1]
