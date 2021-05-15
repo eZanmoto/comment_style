@@ -1,2 +1,5 @@
 # Output directory.
 target
+
+# Python cache directory.
+__pycache__
