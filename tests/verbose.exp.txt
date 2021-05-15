@@ -1,0 +1,5 @@
+Checking 'tests/assets/test.go'...
+tests/assets/test.go:43: (block_starts_empty) Comment blocks can't start with an empty line:
+> //
+  // This comment block starts with a redundant blank line.
+

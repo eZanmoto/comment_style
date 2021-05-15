@@ -1,0 +1,17 @@
+# Copyright 2021 Sean Kelleher. All rights reserved.
+# Use of this source code is governed by an MIT
+# licence that can be found in the LICENCE file.
+
+- paths:
+  - include: 'tests/assets/*.go'
+  comment_markers:
+    line: '//'
+  allow:
+    - block_ends_empty
+    - no_section_ending_punctuation
+    - no_leading_space
+    - no_leading_space_after_tag
+    - starts_with_lowercase
+    - starts_with_lowercase_after_tag
+    - no_ending_punctuation
+    - trailing_comment
