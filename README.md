@@ -111,3 +111,10 @@ Docker build environment by running the following:
 
 Note that the environment will need to have the project requirements installed
 as detailed in the previous section.
+
+### Upload
+
+The package is built and upload using the following sequence:
+
+    $ python3 setup.py sdist bdist_wheel --universal
+    $ python3 -m twine upload dist/*

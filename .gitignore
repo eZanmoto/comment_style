@@ -1,4 +1,7 @@
-# Output directory.
+# Output directories.
+build
+comment_style.egg-info
+dist
 target
 
 # Python cache directory.
