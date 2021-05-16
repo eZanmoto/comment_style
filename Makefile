@@ -20,12 +20,14 @@ check_unit:
 
 .PHONY: check_intg
 check_intg: $(tgt_test_dir)
-	bash scripts/test_intg.sh
+	bash scripts/test_intg_run.sh
+	bash scripts/test_intg_install.sh
 
 .PHONY: check_style
 check_style:
 	pycodestyle \
-		comment_style.py
+		comment_style.py \
+		setup.py
 	python3 comment_style.py \
 		"comment_style.yaml"
 

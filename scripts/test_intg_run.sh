@@ -2,8 +2,9 @@
 # Use of this source code is governed by an MIT
 # licence that can be found in the LICENCE file.
 
-# `$0 [test-name]` runs the integration tests for this project, or just the
-# integration test called `test-name` if the optional argument is provided.
+# `$0 [test-name]` runs the run-related integration tests for this project, or
+# just the integration test called `test-name` if the optional argument is
+# provided.
 
 set -o errexit
 
