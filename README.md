@@ -93,11 +93,11 @@ Note that the requirements for the project must be installed before doing
 anything. These can be installed locally, or through the interactive Bash
 session started above:
 
-    $ pip3 install -r requirements.txt
+    $ python3 -m pip install -r requirements.txt
 
 These can also be installed in the build environment from the host:
 
-    $ bash scripts/with_build_env.sh pip3 install -r requirements.txt
+    $ bash scripts/with_build_env.sh python3 -m pip install -r requirements.txt
 
 The installed packages will persist between containers for the build environment
 using named volumes.

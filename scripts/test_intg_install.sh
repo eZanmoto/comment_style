@@ -6,16 +6,16 @@
 
 set -o errexit
 
-pip3 install .
+python3 -m pip install .
 
 trap 'clean_up' EXIT
 clean_up() {
-    pip3 uninstall --yes comment_style &>/dev/null
+    python3 -m pip uninstall --yes comment_style &>/dev/null
 }
 
 comment_style comment_style.yaml
 
-pip3 uninstall --yes comment_style
+python3 -m pip uninstall --yes comment_style
 
 comment_style comment_style.yaml \
     || test "$?" -ne 1
