@@ -3,3 +3,5 @@ tests/assets/test.go:43: (block_starts_empty) Comment blocks can't start with an
 > //
   // This comment block starts with a redundant blank line.
 
+
+exit code: 1

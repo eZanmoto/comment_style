@@ -37,3 +37,5 @@ tests/assets/test.go:55: (no_leading_space_after_tag) Tagged comments must start
 tests/assets/test.go:57: (no_leading_space_after_tag) Tagged comments must start with a space:
 > // FIXME: Nor this.
 
+
+exit code: 1

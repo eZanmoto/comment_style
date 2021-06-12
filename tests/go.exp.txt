@@ -54,3 +54,5 @@ tests/assets/test.go:57: (no_leading_space_after_tag) Tagged comments must start
 tests/assets/test.go:59: (trailing_comment) Comments must be on their own line:
 > var x = "" // Trailing comments aren't allowed.
 
+
+exit code: 1

@@ -1,1 +1,3 @@
 couldn't parse 'tests/fail_unmatched_paths.yaml': `[1].paths` doesn't match any files
+
+exit code: 1

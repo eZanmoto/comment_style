@@ -63,3 +63,5 @@ tests/assets/test.py:5: (starts_with_lowercase) Letters at the start of comment 
 tests/assets/test.py:7: (no_ending_punctuation) Comment blocks must end with `.`:
 > # This comment should end with a period
 
+
+exit code: 1

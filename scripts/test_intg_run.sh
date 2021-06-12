@@ -25,12 +25,19 @@ for conf in tests/*.yaml ; do
         options='--verbose'
     fi
 
+    set +o errexit
+
     echo -n "$cur_test_name..."
     python3 comment_style.py \
         "tests/$cur_test_name.yaml" \
         $options \
-        &> "target/tests/$cur_test_name.act.txt" \
-        || true
+        &> "target/tests/$cur_test_name.act.txt"
+
+    printf "\nexit code: $?\n" \
+        >> "target/tests/$cur_test_name.act.txt"
+
+    set -o errexit
+
     diff \
         --unified \
         "tests/$cur_test_name.exp.txt" \

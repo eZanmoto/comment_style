@@ -37,3 +37,5 @@ tests/assets/trailing.py:19: (trailing_comment) Comments must be on their own li
 tests/assets/trailing.py:20: (trailing_comment) Comments must be on their own line:
 > x = ''#
 
+
+exit code: 1

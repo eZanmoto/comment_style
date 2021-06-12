@@ -1,1 +1,3 @@
 couldn't parse 'tests/fail_empty.yaml': is empty
+
+exit code: 1

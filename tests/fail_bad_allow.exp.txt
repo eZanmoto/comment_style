@@ -1,1 +1,3 @@
 couldn't parse 'tests/fail_bad_allow.yaml': `[0]` contains invalid error codes: 'bad'
+
+exit code: 1

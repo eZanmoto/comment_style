@@ -25,14 +25,15 @@ def main():
     with open(conf_file) as f:
         conf = yaml.load(f, Loader=yaml.FullLoader)
 
-    paths_rules, err_msg = parse_config(conf)
+    err_setter = Setter()
+    paths_rules, err_msg = parse_config(conf, err_setter)
     if err_msg is not None:
         fatal("couldn't parse '{0}': {1}".format(conf_file, err_msg))
 
     path_logger = PathLogger(verbose)
     for paths, rule in paths_rules:
-        ok = check_files(path_logger, paths, rule)
-    if not ok:
+        check_files(path_logger, paths, rule)
+    if err_setter.is_set:
         sys.exit(1)
 
 
@@ -41,7 +42,15 @@ def fatal(s):
     sys.exit(1)
 
 
-def parse_config(conf):
+class Setter:
+    def __init__(self):
+        self.is_set = False
+
+    def set(self):
+        self.is_set = True
+
+
+def parse_config(conf, err_setter):
     if conf is None:
         return (None, "is empty")
 
@@ -98,7 +107,7 @@ def parse_config(conf):
             (
                 line_comment_marker,
                 block_comment_marker,
-                ErrPrinter(allowed_violations),
+                ErrPrinter(allowed_violations, err_setter),
             ),
         ))
 
@@ -106,19 +115,15 @@ def parse_config(conf):
 
 
 def check_files(path_logger, paths, rule):
-    errs_found = False
     for path in paths:
         path_logger.log(path)
         with open(path) as f:
-            if not check_file(path, rule, f):
-                errs_found = True
-    return not errs_found
+            check_file(path, rule, f)
 
 
 def check_file(path, rule, f):
     line_comment_prefix, block_comment_prefix, err_printer = rule
 
-    errs_found = False
     cur_block = None
     line_num = 1
     for line in f:
@@ -133,7 +138,6 @@ def check_file(path, rule, f):
                 and line.startswith(block_comment_prefix):
             err_code = 'block_comment'
             err_printer.print(path, line_num, err_code, ([line], 0))
-            errs_found = True
 
         if line.startswith(line_comment_prefix):
             stripped_line = line[len(line_comment_prefix):]
@@ -143,8 +147,7 @@ def check_file(path, rule, f):
                 cur_block[1].append(line)
                 cur_block[2].append(stripped_line)
         else:
-            if code_block_has_err(err_printer, path, cur_block):
-                errs_found = True
+            render_code_block_err_if_any(err_printer, path, cur_block)
             cur_block = None
 
             for index in find_all(line, line_comment_prefix):
@@ -156,23 +159,20 @@ def check_file(path, rule, f):
 
         line_num += 1
 
-    if code_block_has_err(err_printer, path, cur_block):
-        errs_found = True
-
-    return not errs_found
+    render_code_block_err_if_any(err_printer, path, cur_block)
 
 
-def code_block_has_err(err_printer, path, cur_block):
+def render_code_block_err_if_any(err_printer, path, cur_block):
     """
-        Output an error and return `True` if an error is found in `cur_block`.
+        Output an error if one is found in `cur_block`.
     """
     if cur_block is None:
-        return False
+        return
 
     block_start_line_num, block_lines, stripped_block_lines = cur_block
     err = check_comment_block(stripped_block_lines)
     if err is None:
-        return False
+        return
 
     err_line_offset, err_code = err
     err_printer.print(
@@ -181,7 +181,6 @@ def code_block_has_err(err_printer, path, cur_block):
         err_code,
         (block_lines, err_line_offset),
     )
-    return True
 
 
 def check_comment_block(lines):
@@ -240,25 +239,23 @@ def try_lstrip(line, prefix):
 
 
 class ErrPrinter:
-    def __init__(self, allowed_violations):
+    def __init__(self, allowed_violations, err_setter):
         self._allowed_violations = allowed_violations
+        self._err_setter = err_setter
 
-    def print(
-        self,
-        fpath,
-        err_line_num,
-        err_code,
-        preview,
-    ):
-        if err_code not in self._allowed_violations:
-            err_lines, err_index = preview
-            print('{}:{}: ({}) {}:{}\n'.format(
-                fpath,
-                err_line_num,
-                err_code,
-                ERR_MSGS[err_code],
-                render_err_lines(err_index, err_lines),
-            ))
+    def print(self, fpath, err_line_num, err_code, preview):
+        if err_code in self._allowed_violations:
+            return
+
+        self._err_setter.set()
+        err_lines, err_index = preview
+        print('{}:{}: ({}) {}:{}\n'.format(
+            fpath,
+            err_line_num,
+            err_code,
+            ERR_MSGS[err_code],
+            render_err_lines(err_index, err_lines),
+        ))
 
 
 ERR_MSGS = {
